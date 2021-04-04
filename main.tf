@@ -39,6 +39,10 @@ resource "azurerm_app_service" "app-service" {
     always_on        = "true"
   }
 
+  app_settings = {    
+    Secret = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault.app-key-vault.vault_uri}secrets/${azurerm_key_vault_secret.app-key-vault-secret.name}/${azurerm_key_vault_secret.app-key-vault-secret.version})"    
+  }
+
   identity {
     type = "SystemAssigned"
   }
