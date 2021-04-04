@@ -1,5 +1,7 @@
-data "azurerm_client_config" "current" {
-  
+data "azurerm_client_config" "current" {}
+
+data "azuread_group" "app-developers" {
+  display_name = "Developers"
 }
 
 resource "azurerm_resource_group" "app-rg" {
@@ -87,6 +89,13 @@ resource "azurerm_key_vault_access_policy" "app-key-vault-access-policy-applicat
   secret_permissions = [ "get", "list" ]
 }
 
+resource "azurerm_key_vault_access_policy" "app-key-vault-access-policy-developers" {
+  key_vault_id = azurerm_key_vault.app-key-vault.id
+  object_id = data.azuread_group.app-developers.object_id
+  tenant_id = azurerm_app_service.app-service.identity[0].tenant_id
+  secret_permissions = [ "delete", "get", "set", "purge", "list" ]
+}
+
 resource "azurerm_key_vault_secret" "app-key-vault-secret" {
   name = "${var.env}-${var.app}-kv-secret"
   key_vault_id = azurerm_key_vault.app-key-vault.id
@@ -96,6 +105,12 @@ resource "azurerm_key_vault_secret" "app-key-vault-secret" {
   tags = {
    "environment" = var.env
  }
+
+ lifecycle {
+   ignore_changes = [
+     value
+   ]
+ }
 }
 
 resource "azurerm_container_registry" "app-container-registry" {
@@ -104,6 +119,10 @@ resource "azurerm_container_registry" "app-container-registry" {
   location = var.location
   sku = "Standard"
   admin_enabled = true
+
+  tags = {
+   "environment" = var.env
+ }
 }
 
 resource "azurerm_role_assignment" "app-role-assigment-acrpull" {
