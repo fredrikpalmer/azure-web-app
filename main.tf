@@ -40,7 +40,10 @@ resource "azurerm_app_service" "app-service" {
   }
 
   app_settings = {    
-    Secret = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault.app-key-vault.vault_uri}secrets/${azurerm_key_vault_secret.app-key-vault-secret.name}/${azurerm_key_vault_secret.app-key-vault-secret.version})"    
+    Secret = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault.app-key-vault.vault_uri}secrets/${azurerm_key_vault_secret.app-key-vault-secret.name}/${azurerm_key_vault_secret.app-key-vault-secret.version})"
+    DOCKER_REGISTRY_SERVER_URL = "https://${azurerm_container_registry.app-container-registry.login_server}"
+    DOCKER_REGISTRY_SERVER_USERNAME = azurerm_container_registry.app-container-registry.admin_username
+    DOCKER_REGISTRY_SERVER_PASSWORD = azurerm_container_registry.app-container-registry.admin_password
   }
 
   identity {
