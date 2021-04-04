@@ -53,6 +53,12 @@ resource "azurerm_app_service" "app-service" {
   tags = {
    "environment" = var.env
  }
+
+ lifecycle {
+   ignore_changes = [
+    app_settings
+   ]
+ }
 }
 
 resource "azurerm_key_vault" "app-key-vault" {
