@@ -35,7 +35,7 @@ resource "azurerm_app_service" "app-service" {
   location = var.location
 
   site_config {
-    linux_fx_version = "DOCKER|appsvcsample/static-site:latest"
+    linux_fx_version = "DOCKER|${azurerm_container_registry.app-container-registry.login_server}/${var.app}:latest"
     always_on        = "true"
   }
 
