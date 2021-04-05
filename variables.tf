@@ -42,6 +42,12 @@ variable "domain" {
   default = "domain"
 }
 
+variable "app" {
+  type = string
+  description = "Name of the app"
+  default = "app"
+}
+
 variable "context" {
   type = string
   description = "Name of the context"

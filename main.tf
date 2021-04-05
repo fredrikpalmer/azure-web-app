@@ -5,7 +5,7 @@ data "azuread_group" "developers" {
 }
 
 locals {
-  name = "${var.org}-${var.team}-${var.domain}-${var.context}"
+  name = "${var.org}-${var.domain}-${var.app}-${var.context}"
   tags = {
     "organization" = var.org
     "team" = var.team
