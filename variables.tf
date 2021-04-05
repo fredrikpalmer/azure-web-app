@@ -33,25 +33,25 @@ variable "org" {
 variable "team" {
   type = string
   description = "Name of the team"
-  default = "team"
+  default = "Chuck norris"
+}
+
+variable "business_area" {
+  type = string
+  description = "Name of the business area"
+  default = "ecom"
 }
 
 variable "domain" {
   type = string
   description = "Name of the domain"
-  default = "domain"
-}
-
-variable "app" {
-  type = string
-  description = "Name of the app"
-  default = "app"
+  default = "order"
 }
 
 variable "context" {
   type = string
   description = "Name of the context"
-  default = "api"
+  default = "web"
 }
 
 variable "env" {

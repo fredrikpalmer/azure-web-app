@@ -5,10 +5,11 @@ data "azuread_group" "developers" {
 }
 
 locals {
-  name = "${var.org}-${var.domain}-${var.app}-${var.context}"
+  name = "${var.org}-${var.business_area}-${var.domain}-${var.context}"
   tags = {
     "organization" = var.org
     "team" = var.team
+    "business_area" = var.business_area
     "domain" = var.domain
     "context" = var.context
     "environment" = var.env
@@ -44,7 +45,7 @@ resource "azurerm_app_service" "app_service" {
   location = var.location
 
   site_config {
-    linux_fx_version = "DOCKER|${azurerm_container_registry.app_container_registry.login_server}/${var.app}-${var.context}:latest"
+    linux_fx_version = "DOCKER|${azurerm_container_registry.app_container_registry.login_server}/${var.domain}-${var.context}:latest"
     always_on        = "true"
   }
 
@@ -115,7 +116,7 @@ resource "azurerm_key_vault_secret" "app_key_vault_secret" {
 }
 
 resource "azurerm_container_registry" "app_container_registry" {
-  name = "${var.org}${var.domain}"
+  name = "${var.org}${var.business_area}"
   resource_group_name = azurerm_resource_group.app_rg.name
   location = var.location
   sku = "Standard"
