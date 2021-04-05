@@ -1,16 +1,20 @@
 data "azurerm_client_config" "current" {}
 
-data "azuread_group" "app-developers" {
+data "azuread_group" "developers" {
   display_name = "Developers"
+}
+
+locals {
+  tags = {
+    "environment" = var.env
+  }
 }
 
 resource "azurerm_resource_group" "app-rg" {
  name = "${var.env}-${var.app}-rg" 
  location = var.location
 
- tags = {
-   "environment" = var.env
- }
+ tags = local.tags
 }
 
 resource "azurerm_app_service_plan" "app-service-plan" {
@@ -25,9 +29,7 @@ resource "azurerm_app_service_plan" "app-service-plan" {
     tier = "standard"
   }
   
-  tags = {
-   "environment" = var.env
- }
+  tags = local.tags
 }
 
 resource "azurerm_app_service" "app-service" {
@@ -52,9 +54,7 @@ resource "azurerm_app_service" "app-service" {
     type = "SystemAssigned"
   }
 
-  tags = {
-   "environment" = var.env
- }
+  tags = local.tags
 
  lifecycle {
    ignore_changes = [
@@ -70,9 +70,7 @@ resource "azurerm_key_vault" "app-key-vault" {
   tenant_id = var.tenant_id
   sku_name = "standard"
 
-  tags = {
-   "environment" = var.env
- }
+  tags = local.tags
 }
 
 resource "azurerm_key_vault_access_policy" "app-key-vault-access-policy-terraform" {
@@ -91,7 +89,7 @@ resource "azurerm_key_vault_access_policy" "app-key-vault-access-policy-applicat
 
 resource "azurerm_key_vault_access_policy" "app-key-vault-access-policy-developers" {
   key_vault_id = azurerm_key_vault.app-key-vault.id
-  object_id = data.azuread_group.app-developers.object_id
+  object_id = data.azuread_group.developers.object_id
   tenant_id = azurerm_app_service.app-service.identity[0].tenant_id
   secret_permissions = [ "delete", "get", "set", "purge", "list" ]
 }
@@ -102,9 +100,7 @@ resource "azurerm_key_vault_secret" "app-key-vault-secret" {
   value = "secret"
   depends_on = [azurerm_key_vault_access_policy.app-key-vault-access-policy-terraform]
 
-  tags = {
-   "environment" = var.env
- }
+  tags = local.tags
 
  lifecycle {
    ignore_changes = [
@@ -120,9 +116,7 @@ resource "azurerm_container_registry" "app-container-registry" {
   sku = "Standard"
   admin_enabled = true
 
-  tags = {
-   "environment" = var.env
- }
+  tags = local.tags
 }
 
 resource "azurerm_role_assignment" "app-role-assigment-acrpull" {
