@@ -22,9 +22,6 @@ steps:
   
     echo "terraform apply"
     docker run -v $(Build.SourcesDirectory):/terraform -e ARM_CLIENT_ID=$CLIENT_ID -e ARM_CLIENT_SECRET=$CLIENT_SECRET -e ARM_SUBSCRIPTION_ID=$SUBSCRIPTION_ID -e ARM_TENANT_ID=$TENANT_ID fredrikpalmerpipelines.azurecr.io/terraform-commander apply -lock=false -auto-approve "tfplan"
-  
-    echo "terraform destroy"
-    docker run -v $(Build.SourcesDirectory):/terraform -e ARM_CLIENT_ID=$CLIENT_ID -e ARM_CLIENT_SECRET=$CLIENT_SECRET -e ARM_SUBSCRIPTION_ID=$SUBSCRIPTION_ID -e ARM_TENANT_ID=$TENANT_ID fredrikpalmerpipelines.azurecr.io/terraform-commander destroy -lock=false -var="sub=$SUBSCRIPTION_ID" -var="client_id=$CLIENT_ID" -var="client_secret=$CLIENT_SECRET" -var="tenant_id=$TENANT_ID" -auto-approve
   env:
     CLIENT_ID: $(ARM_CLIENT_ID)
     CLIENT_SECRET: $(ARM_CLIENT_SECRET)
