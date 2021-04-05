@@ -115,7 +115,7 @@ resource "azurerm_key_vault_secret" "app_key_vault_secret" {
 }
 
 resource "azurerm_container_registry" "app_container_registry" {
-  name = "${var.org}${var.team}"
+  name = "${var.org}${var.domain}"
   resource_group_name = azurerm_resource_group.app_rg.name
   location = var.location
   sku = "Standard"
