@@ -1,30 +1,29 @@
 trigger:
-- master
+  - master
 
 pool:
   vmImage: ubuntu-latest
 
 steps:
-- task: Docker@2
-  inputs:
-    containerRegistry: 'fredrikpalmerpipelines'
-    command: 'login'
-  
-- bash: |
-    echo "terraform init"
-    docker run -v $(Build.SourcesDirectory):/terraform -e ARM_CLIENT_ID=$CLIENT_ID -e ARM_CLIENT_SECRET=$CLIENT_SECRET -e ARM_SUBSCRIPTION_ID=$SUBSCRIPTION_ID -e ARM_TENANT_ID=$TENANT_ID fredrikpalmerpipelines.azurecr.io/terraform-commander init
-  
-    echo "terraform validate"
-    docker run -v $(Build.SourcesDirectory):/terraform -e ARM_CLIENT_ID=$CLIENT_ID -e ARM_CLIENT_SECRET=$CLIENT_SECRET -e ARM_SUBSCRIPTION_ID=$SUBSCRIPTION_ID -e ARM_TENANT_ID=$TENANT_ID fredrikpalmerpipelines.azurecr.io/terraform-commander validate
-  
-    echo "terraform plan"
-    docker run -v $(Build.SourcesDirectory):/terraform -e ARM_CLIENT_ID=$CLIENT_ID -e ARM_CLIENT_SECRET=$CLIENT_SECRET -e ARM_SUBSCRIPTION_ID=$SUBSCRIPTION_ID -e ARM_TENANT_ID=$TENANT_ID fredrikpalmerpipelines.azurecr.io/terraform-commander plan -lock=false -var="sub=$SUBSCRIPTION_ID" -var="client_id=$CLIENT_ID" -var="client_secret=$CLIENT_SECRET" -var="tenant_id=$TENANT_ID" -out=tfplan
-  
-    echo "terraform apply"
-    docker run -v $(Build.SourcesDirectory):/terraform -e ARM_CLIENT_ID=$CLIENT_ID -e ARM_CLIENT_SECRET=$CLIENT_SECRET -e ARM_SUBSCRIPTION_ID=$SUBSCRIPTION_ID -e ARM_TENANT_ID=$TENANT_ID fredrikpalmerpipelines.azurecr.io/terraform-commander apply -lock=false -auto-approve "tfplan"
-  env:
-    CLIENT_ID: $(ARM_CLIENT_ID)
-    CLIENT_SECRET: $(ARM_CLIENT_SECRET)
-    SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID)
-    TENANT_ID: $(ARM_TENANT_ID)
+  - task: Docker@2
+    inputs:
+      containerRegistry: "fredrikpalmerpipelines"
+      command: "login"
 
+  - bash: |
+      echo "terraform init"
+      docker run -v $(Build.SourcesDirectory):/terraform -e ARM_CLIENT_ID=$CLIENT_ID -e ARM_CLIENT_SECRET=$CLIENT_SECRET -e ARM_SUBSCRIPTION_ID=$SUBSCRIPTION_ID -e ARM_TENANT_ID=$TENANT_ID terraform-commander init
+
+      echo "terraform validate"
+      docker run -v $(Build.SourcesDirectory):/terraform -e ARM_CLIENT_ID=$CLIENT_ID -e ARM_CLIENT_SECRET=$CLIENT_SECRET -e ARM_SUBSCRIPTION_ID=$SUBSCRIPTION_ID -e ARM_TENANT_ID=$TENANT_ID terraform-commander validate
+
+      echo "terraform plan"
+      docker run -v $(Build.SourcesDirectory):/terraform -e ARM_CLIENT_ID=$CLIENT_ID -e ARM_CLIENT_SECRET=$CLIENT_SECRET -e ARM_SUBSCRIPTION_ID=$SUBSCRIPTION_ID -e ARM_TENANT_ID=$TENANT_ID terraform-commander plan -lock=false -var="sub=$SUBSCRIPTION_ID" -var="client_id=$CLIENT_ID" -var="client_secret=$CLIENT_SECRET" -var="tenant_id=$TENANT_ID" -out=tfplan
+
+      echo "terraform apply"
+      docker run -v $(Build.SourcesDirectory):/terraform -e ARM_CLIENT_ID=$CLIENT_ID -e ARM_CLIENT_SECRET=$CLIENT_SECRET -e ARM_SUBSCRIPTION_ID=$SUBSCRIPTION_ID -e ARM_TENANT_ID=$TENANT_ID terraform-commander apply -lock=false -auto-approve "tfplan"
+    env:
+      CLIENT_ID: $(ARM_CLIENT_ID)
+      CLIENT_SECRET: $(ARM_CLIENT_SECRET)
+      SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID)
+      TENANT_ID: $(ARM_TENANT_ID)
