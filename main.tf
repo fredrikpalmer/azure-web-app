@@ -46,6 +46,7 @@ resource "azurerm_linux_web_app" "app_service" {
     DOCKER_REGISTRY_SERVER_URL      = "https://${azurerm_container_registry.app_container_registry.login_server}"
     DOCKER_REGISTRY_SERVER_USERNAME = azurerm_container_registry.app_container_registry.admin_username
     DOCKER_REGISTRY_SERVER_PASSWORD = azurerm_container_registry.app_container_registry.admin_password
+    DOCKER_CUSTOM_IMAGE_NAME        = "DOCKER|${azurerm_container_registry.app_container_registry.login_server}/${var.domain}-${var.context}:latest"
   }
 
   identity {
