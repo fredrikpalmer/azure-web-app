@@ -23,24 +23,19 @@ resource "azurerm_resource_group" "app_rg" {
   tags = local.tags
 }
 
-resource "azurerm_app_service_plan" "app_service_plan" {
+resource "azurerm_service_plan" "app_service_plan" {
   name                = "${local.name}-plan"
   resource_group_name = azurerm_resource_group.app_rg.name
   location            = var.location
-  kind                = "Linux"
-  reserved            = true
-
-  sku {
-    size = "S1"
-    tier = "standard"
-  }
+  os_type             = "Linux"
+  sku_name            = "S1"
 
   tags = local.tags
 }
 
-resource "azurerm_app_service" "app_service" {
+resource "azurerm_linux_web_app" "app_service" {
   name                = "${local.name}-service"
-  app_service_plan_id = azurerm_app_service_plan.app_service_plan.id
+  service_plan_id     = azurerm_service_plan.app_service_plan.id
   resource_group_name = azurerm_resource_group.app_rg.name
   location            = var.location
 
@@ -81,8 +76,8 @@ resource "azurerm_key_vault" "app_key_vault" {
 
 resource "azurerm_key_vault_access_policy" "app_key_vault_access_policy" {
   key_vault_id       = azurerm_key_vault.app_key_vault.id
-  object_id          = azurerm_app_service.app_service.identity[0].principal_id
-  tenant_id          = azurerm_app_service.app_service.identity[0].tenant_id
+  object_id          = azurerm_linux_web_app.app_service.identity[0].principal_id
+  tenant_id          = azurerm_linux_web_app.app_service.identity[0].tenant_id
   secret_permissions = ["Get", "List"]
 }
 
@@ -96,7 +91,7 @@ resource "azurerm_key_vault_access_policy" "app_key_vault_access_policy_terrafor
 resource "azurerm_key_vault_access_policy" "app_key_vault-access_policy_developers" {
   key_vault_id       = azurerm_key_vault.app_key_vault.id
   object_id          = data.azuread_group.developers.object_id
-  tenant_id          = azurerm_app_service.app_service.identity[0].tenant_id
+  tenant_id          = azurerm_linux_web_app.app_service.identity[0].tenant_id
   secret_permissions = ["Delete", "Get", "Set", "Purge", "List"]
 }
 
@@ -126,7 +121,7 @@ resource "azurerm_container_registry" "app_container_registry" {
 }
 
 resource "azurerm_role_assignment" "app_role_assigment_acrpull" {
-  principal_id         = azurerm_app_service.app_service.identity[0].principal_id
+  principal_id         = azurerm_linux_web_app.app_service.identity[0].principal_id
   scope                = azurerm_container_registry.app_container_registry.id
   role_definition_name = "AcrPull"
 }
