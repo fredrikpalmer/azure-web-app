@@ -40,8 +40,10 @@ resource "azurerm_linux_web_app" "app_service" {
   location            = var.location
 
   site_config {
-    linux_fx_version = "DOCKER|${azurerm_container_registry.app_container_registry.login_server}/${var.domain}-${var.context}:latest"
-    always_on        = "true"
+    application_stack {
+      docker_image     = "DOCKER|${azurerm_container_registry.app_container_registry.login_server}/${var.domain}-${var.context}:latest"
+      docker_image_tag = "latest"
+    }
   }
 
   app_settings = {
