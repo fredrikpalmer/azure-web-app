@@ -39,12 +39,7 @@ resource "azurerm_linux_web_app" "app_service" {
   resource_group_name = azurerm_resource_group.app_rg.name
   location            = var.location
 
-  site_config {
-    application_stack {
-      docker_image     = "DOCKER|${azurerm_container_registry.app_container_registry.login_server}/${var.domain}-${var.context}:latest"
-      docker_image_tag = "latest"
-    }
-  }
+  site_config {}
 
   app_settings = {
     Secret                          = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault.app_key_vault.vault_uri}secrets/${azurerm_key_vault_secret.app_key_vault_secret.name}/${azurerm_key_vault_secret.app_key_vault_secret.version})"
